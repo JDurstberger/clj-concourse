@@ -13,6 +13,10 @@
 (use-fixtures :once
   (partial wmk/wiremock-fixture {:port wiremock-port}))
 
+(deftest client-creation
+  (testing "throws error when url not provided"
+    (is (thrown? AssertionError (concourse/client {})))))
+
 (deftest returns-server-info
   (let [api-response (:success api-responses/get-info)
         client (concourse/client {:url server-url})
