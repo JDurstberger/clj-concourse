@@ -1,0 +1,35 @@
+{
+ :tasks
+ {-platform
+  {:requires ([clojure.string :as str])
+   :task     (if (= "Darwin" (str/trim (:out (shell {:out :string} "uname"))))
+               :osx
+               :linux)}
+
+  library:lint
+  {:depends [-platform]
+   :task    (do
+              (println "Linting...")
+              (if (= :osx -platform)
+                (shell "./scripts/lint/clj-kondo-2021-06-18-mac --lint src/")
+                (shell "./scripts/lint/clj-kondo-2021-06-18-linux --lint src/")))}
+
+  library:format
+  {:depends [-platform]
+   :task    (do
+              (println "Formatting...")
+              (if (= :osx -platform)
+                (shell "./scripts/format/cljstyle-0-15-0-mac fix")
+                (shell "./scripts/format/cljstyle-0-15-0-linux fix")))}
+
+  library:test
+  {:task (do
+           (println "Testing...")
+           (shell "clojure -X:test"))}
+
+  library:check
+  {:depends [library:format
+             library:lint]}
+  default
+  {:depends [library:check
+             library:test]}}}

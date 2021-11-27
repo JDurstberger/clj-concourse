@@ -1,0 +1,27 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/source
+    docker:
+      - image: clojure:openjdk-11-tools-deps
+    steps:
+      - checkout
+      - run: ./scripts/ci/common/install-babashka.sh
+      - run: ./scripts/ci/steps/build.sh
+  test:
+    working_directory: ~/source
+    docker:
+      - image: clojure:openjdk-11-tools-deps
+    steps:
+      - checkout
+      - run: ./scripts/ci/common/install-babashka.sh
+      - run: ./scripts/ci/steps/test.sh
+
+workflows:
+  version: 2
+  pipeline:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
