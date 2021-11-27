@@ -35,7 +35,7 @@ fi
 
 echo "Starting babashka"
 if [[ "$#" -eq 0 ]]; then
-   bb run default
+   bb default
 else
-  bb run "$@"
+  bb "$@"
 fi

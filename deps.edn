@@ -1,10 +1,15 @@
 {:deps
- {}
+ {b-social/jason    {:mvn/version "0.1.5"}
+  clj-http/clj-http {:mvn/version "3.10.1"}}
 
  :aliases
- {:test {:extra-paths ["test"]
-         :extra-deps  {io.github.cognitect-labs/test-runner
-                       {:git/url "https://github.com/cognitect-labs/test-runner.git"
-                        :sha     "9e35c979860c75555adaff7600070c60004a0f44"}}
+ {:test {:extra-paths ["test" "dev"]
+         :extra-deps  {kelveden/clj-wiremock  {:mvn/version "1.5.7"}
+                       freeport/freeport      {:mvn/version "1.0.0"}
+                       faker/faker            {:mvn/version "0.3.2"}
+                       org.clojure/test.check {:mvn/version "0.9.0"}
+                       io.github.cognitect-labs/test-runner
+                                              {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                                               :sha     "9e35c979860c75555adaff7600070c60004a0f44"}}
          :main-opts   ["-m" "cognitect.test-runner"]
          :exec-fn     cognitect.test-runner.api/test}}}
