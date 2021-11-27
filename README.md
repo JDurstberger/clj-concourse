@@ -1,4 +1,5 @@
 # clj-concourse
+[![CircleCI](https://circleci.com/gh/JDurstberger/clj-concourse.svg?style=shield)](https://circleci.com/gh/JDurstberger/clj-concourse)
 
 A convenient way to interact with concourse-ci
 
