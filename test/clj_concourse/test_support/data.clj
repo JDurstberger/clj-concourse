@@ -6,6 +6,10 @@
     [faker.internet :as faker-internet]
     [faker.lorem :as faker-lorem]))
 
+(defn random-client
+  [url]
+  {:api-url url})
+
 (defn create-sem-ver-generator
   [part-count]
   (fn []
@@ -32,6 +36,10 @@
   #(->> (faker-lorem/words)
         (take (rand-int 5))
         (clojure.string/join " ")))
+
+(defn random-token
+  []
+  (gen/generate (gen/such-that not-empty (gen/string-alphanumeric))))
 
 (defn random-info
   []

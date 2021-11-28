@@ -37,4 +37,10 @@
   (s/or :absolute-url absolute-url?
         :localhost-url localhost-url?))
 
-(s/def :clj-concourse/client-config (s/keys :req-un [:clj-concourse/url]))
+(s/def :clj-concourse/username string?)
+(s/def :clj-concourse/password string?)
+
+(s/def :clj-concourse/client-config
+  (s/keys :req-un [:clj-concourse/url
+                   :clj-concourse/username
+                   :clj-concourse/password]))
