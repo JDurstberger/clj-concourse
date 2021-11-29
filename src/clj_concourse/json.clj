@@ -8,6 +8,7 @@
          ->concourse-json)
 
 #_:clj-kondo/ignore
+
 (json/defcoders
   concourse
   :encode-key-fn (json/->encode-key-fn ->snake_case_string)

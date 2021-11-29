@@ -31,20 +31,31 @@
   {:pre [(s/valid? :clj-concourse/client-config config)]}
   (try
     (let [access-token (get-access-token config)]
-      {:api-url (str url "/api/v1")
+      {:url          url
        :access-token access-token})
     (catch Exception e (exception->error e))))
 
 (defn get-info
   [client]
-  (-> (http/get (str (:api-url client) "/api/v1/info")
+  (-> (http/get (str (:url client) "/api/v1/info")
                 {:as :json-kebab-keys})
+      (:body)))
+
+(defn get-teams
+  [{:keys [url access-token]}]
+  (-> (http/get (str url "/api/v1/teams")
+                {:oauth-token access-token
+                 :as          :json-kebab-keys})
       (:body)))
 
 (comment
   (require '[dev]
            '[clojure.pprint :refer [pprint]])
 
-  (-> (client {:url dev/server-url})
-      (get-info)
-      (pprint)))
+  (def c (client {:url      dev/server-url
+                  :username dev/username
+                  :password dev/password}))
+
+  (println c)
+  (pprint (get-info c))
+  (pprint (get-teams c)))

@@ -8,7 +8,7 @@
 
 (defn random-client
   [url]
-  {:api-url url})
+  {:url url})
 
 (defn create-sem-ver-generator
   [part-count]
@@ -39,7 +39,7 @@
 
 (defn random-token
   []
-  (gen/generate (gen/such-that not-empty (gen/string-alphanumeric))))
+  (gen/generate (gen/such-that seq (gen/string-alphanumeric))))
 
 (defn random-info
   []
@@ -48,4 +48,11 @@
    :external-url   (random-absolute-url)
    :cluster-name   (random-cluster-name)})
 
-(random-info)
+(defn random-team-id
+  []
+  (gen/generate (gen/such-that pos? (gen/int))))
+
+(defn random-team
+  []
+  {:id   (random-team-id)
+   :name (first (faker.lorem/words))})

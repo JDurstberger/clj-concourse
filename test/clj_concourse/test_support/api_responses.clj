@@ -1,5 +1,6 @@
 (ns clj-concourse.test-support.api-responses
   (:require
+    [clj-concourse.test-support.data :as data]
     [clj-concourse.test-support.json :as json]))
 
 (def get-token
@@ -30,3 +31,13 @@
                                               :worker_version worker-version
                                               :external_url   external-url
                                               :cluster_name   cluster-name})}]})}})
+
+(def get-teams
+  {:success
+   {:->wmk-stub
+    (fn [teams]
+      {:req [:GET "/api/v1/teams"]
+       :res [200 {:body (json/->default-json
+                          (map #(hash-map :id (:id %)
+                                          :name (:name %))
+                               teams))}]})}})

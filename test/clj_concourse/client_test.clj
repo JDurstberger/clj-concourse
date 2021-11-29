@@ -11,7 +11,7 @@
 (def server-url (str "http://localhost:" wiremock-port))
 
 (use-fixtures :once
-              (partial wmk/wiremock-fixture {:port wiremock-port}))
+  (partial wmk/wiremock-fixture {:port wiremock-port}))
 
 (def client-config
   {:url      server-url
@@ -42,7 +42,7 @@
   (testing "returns client when creation succeeds"
     (let [api-response (:success api-responses/get-token)
           token (data/random-token)
-          expected-client {:api-url      (str server-url "/api/v1")
+          expected-client {:url          server-url
                            :access-token token}]
       (wmk/with-stubs
         [((:->wmk-stub api-response) token)]
@@ -59,3 +59,14 @@
     (wmk/with-stubs
       [((:->wmk-stub api-response) info)]
       (is (= expected-info (concourse/get-info client))))))
+
+(deftest returns-teams
+  (let [api-response (:success api-responses/get-teams)
+        client (data/random-client server-url)
+        team (data/random-team)
+        expected-team {:id   (:id team)
+                       :name (:name team)}]
+
+    (wmk/with-stubs
+      [((:->wmk-stub api-response) [team])]
+      (is (= [expected-team] (concourse/get-teams client))))))
