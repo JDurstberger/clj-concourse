@@ -48,6 +48,21 @@
                  :as          :json-kebab-keys})
       (:body)))
 
+(def operations
+  {:list-teams      {:http-method http/get
+                     :path        "/api/v1/teams"}
+   :get-server-info {:http-method http/get
+                     :path        "/api/v1/info"}})
+
+(defn invoke
+  [{:keys [url access-token]}
+   {:keys [op]}]
+  (let [{:keys [http-method path]} (op operations)]
+    (-> (http-method (str url path)
+                     {:oauth-token access-token
+                      :as          :json-kebab-keys})
+        (:body))))
+
 (comment
   (require '[dev]
            '[clojure.pprint :refer [pprint]])

@@ -70,3 +70,26 @@
     (wmk/with-stubs
       [((:->wmk-stub api-response) [team])]
       (is (= [expected-team] (concourse/get-teams client))))))
+
+(deftest returns-server-inf0-v2
+  (let [api-response (:success api-responses/get-info)
+        client (data/random-client server-url)
+        info (data/random-info)
+        expected-info {:version        (:version info)
+                       :worker-version (:worker-version info)
+                       :external-url   (:external-url info)
+                       :cluster-name   (:cluster-name info)}]
+    (wmk/with-stubs
+      [((:->wmk-stub api-response) info)]
+      (is (= expected-info (concourse/invoke client {:op :get-server-info}))))))
+
+(deftest returns-teams-v2
+  (let [api-response (:success api-responses/get-teams)
+        client (data/random-client server-url)
+        team (data/random-team)
+        expected-team {:id   (:id team)
+                       :name (:name team)}]
+
+    (wmk/with-stubs
+      [((:->wmk-stub api-response) [team])]
+      (is (= [expected-team] (concourse/invoke client {:op :list-teams}))))))
