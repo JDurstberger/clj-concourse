@@ -35,19 +35,6 @@
        :access-token access-token})
     (catch Exception e (exception->error e))))
 
-(defn get-info
-  [client]
-  (-> (http/get (str (:url client) "/api/v1/info")
-                {:as :json-kebab-keys})
-      (:body)))
-
-(defn get-teams
-  [{:keys [url access-token]}]
-  (-> (http/get (str url "/api/v1/teams")
-                {:oauth-token access-token
-                 :as          :json-kebab-keys})
-      (:body)))
-
 (def operations
   {:list-teams      {:http-method http/get
                      :path        "/api/v1/teams"}
