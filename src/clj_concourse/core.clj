@@ -23,8 +23,11 @@
         (-> (ex-data e)
             :body
             (json/<-concourse-json))]
-    {:error       error
-     :description error-description}))
+    (if error
+      {:error       error
+       :description error-description}
+      {:error       (ex-cause e)
+       :description (ex-message e)})))
 
 (defn client
   [{:keys [url] :as config}]
@@ -54,10 +57,9 @@
   (require '[dev]
            '[clojure.pprint :refer [pprint]])
 
-  (def c (client {:url      dev/server-url
-                  :username dev/username
-                  :password dev/password}))
+  (def config {:url      dev/server-url
+               :username dev/username
+               :password dev/password})
+  (def c (client config))
 
-  (println c)
-  (pprint (get-info c))
-  (pprint (get-teams c)))
+  (pprint (invoke c {:op :get-server-info})))
