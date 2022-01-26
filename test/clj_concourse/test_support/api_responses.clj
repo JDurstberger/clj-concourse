@@ -50,3 +50,11 @@
                           (map #(hash-map :id (:id %)
                                           :name (:name %))
                                jobs))}]})}})
+
+(def generic-error
+  (let [body "generic server error body"]
+    {:body body
+     :->wmk-stub
+     (fn []
+       {:req [:GET #"/.*"]
+        :res [500 {:body body}]})}))

@@ -41,11 +41,14 @@
    {:keys [op]}]
   (let [{:keys [http-method path]} (op operations)
         response (http-method (str url path)
-                              {:oauth-token access-token
-                               :as          :json-kebab-keys})]
+                              {:oauth-token      access-token
+                               :throw-exceptions false})]
     (if (http/success? response)
-      (:body response)
-      {:error {:response response}})))
+      (-> response
+          :body
+          (json/<-concourse-json))
+      {:error {:status (:status response)
+               :description (:body response)}})))
 
 (comment
   (require '[dev]
