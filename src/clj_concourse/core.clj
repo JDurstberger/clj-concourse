@@ -31,6 +31,8 @@
 (def operations
   {:list-teams      {:http-method http/get
                      :path        "/api/v1/teams"}
+   :list-pipelines  {:http-method http/get
+                     :path        "/api/v1/pipelines"}
    :list-jobs       {:http-method http/get
                      :path        "/api/v1/jobs"}
    :get-server-info {:http-method http/get
@@ -47,7 +49,7 @@
       (-> response
           :body
           (json/<-concourse-json))
-      {:error {:status (:status response)
+      {:error {:status      (:status response)
                :description (:body response)}})))
 
 (comment
@@ -63,6 +65,5 @@
   (pprint (invoke c {:op :list-teams}))
 
 
-  (->> (invoke c {:op :list-jobs})
-       (:jobs)
+  (->> (invoke c {:op :list-pipelines})
        (first)))

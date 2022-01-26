@@ -65,3 +65,8 @@
   []
   {:id   (random-job-id)
    :name (first (faker.lorem/words))})
+
+(defn random-pipeline
+  []
+  {:id   (random-pos-int)
+   :name (first (faker.lorem/words))})

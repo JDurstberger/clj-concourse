@@ -51,6 +51,16 @@
                                           :name (:name %))
                                jobs))}]})}})
 
+(def get-pipelines
+  {:success
+   {:->wmk-stub
+    (fn [pipelines]
+      {:req [:GET "/api/v1/pipelines"]
+       :res [200 {:body (json/->default-json
+                          (map #(hash-map :id (:id %)
+                                          :name (:name %))
+                               pipelines))}]})}})
+
 (def generic-error
   (let [body "generic server error body"]
     {:body body

@@ -11,7 +11,7 @@
 (def server-url (str "http://localhost:" wiremock-port))
 
 (use-fixtures :once
-              (partial wmk/wiremock-fixture {:port wiremock-port}))
+  (partial wmk/wiremock-fixture {:port wiremock-port}))
 
 (def client-config
   {:url      server-url
@@ -75,12 +75,24 @@
   (let [api-response (:success api-responses/get-jobs)
         client (data/random-client server-url)
         job (data/random-job)
-        expected-team {:id   (:id job)
-                       :name (:name job)}]
+        expected-job {:id   (:id job)
+                      :name (:name job)}]
 
     (wmk/with-stubs
       [((:->wmk-stub api-response) [job])]
-      (is (= [expected-team] (concourse/invoke client {:op :list-jobs}))))))
+      (is (= [expected-job] (concourse/invoke client {:op :list-jobs}))))))
+
+(deftest returns-pipelines
+  (let [api-response (:success api-responses/get-pipelines)
+        client (data/random-client server-url)
+        pipeline (data/random-pipeline)
+        expected-pipeline {:id   (:id pipeline)
+                           :name (:name pipeline)}]
+
+    (wmk/with-stubs
+      [((:->wmk-stub api-response) [pipeline])]
+      (is (= [expected-pipeline]
+             (concourse/invoke client {:op :list-pipelines}))))))
 
 (deftest handles-server-error
   (let [api-response api-responses/generic-error
