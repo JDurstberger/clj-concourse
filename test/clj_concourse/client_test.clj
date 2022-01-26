@@ -70,3 +70,15 @@
     (wmk/with-stubs
       [((:->wmk-stub api-response) [team])]
       (is (= [expected-team] (concourse/invoke client {:op :list-teams}))))))
+
+
+(deftest returns-jobs
+  (let [api-response (:success api-responses/get-jobs)
+        client (data/random-client server-url)
+        job (data/random-job)
+        expected-team {:id   (:id job)
+                       :name (:name job)}]
+
+    (wmk/with-stubs
+      [((:->wmk-stub api-response) [job])]
+      (is (= [expected-team] (concourse/invoke client {:op :list-jobs}))))))

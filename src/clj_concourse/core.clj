@@ -8,13 +8,14 @@
 
 (defn- get-access-token
   [{:keys [url username password]}]
-  (-> (http/post (str url "/sky/issuer/token")
-                 {:basic-auth  "fly:Zmx5"
-                  :form-params {:grant_type "password"
-                                :username   username
-                                :password   password
-                                :scope      "openid profile email federated:id groups"}
-                  :as          :json-kebab-keys})
+  (-> (http/post
+        (str url "/sky/issuer/token")
+        {:basic-auth  "fly:Zmx5"
+         :form-params {:grant_type "password"
+                       :username   username
+                       :password   password
+                       :scope      "openid profile email federated:id groups"}
+         :as          :json-kebab-keys})
       (get-in [:body :access-token])))
 
 (defn exception->error
@@ -41,17 +42,21 @@
 (def operations
   {:list-teams      {:http-method http/get
                      :path        "/api/v1/teams"}
+   :list-jobs       {:http-method http/get
+                     :path        "/api/v1/jobs"}
    :get-server-info {:http-method http/get
                      :path        "/api/v1/info"}})
 
 (defn invoke
   [{:keys [url access-token]}
    {:keys [op]}]
-  (let [{:keys [http-method path]} (op operations)]
-    (-> (http-method (str url path)
-                     {:oauth-token access-token
-                      :as          :json-kebab-keys})
-        (:body))))
+  (let [{:keys [http-method path]} (op operations)
+        response (http-method (str url path)
+                              {:oauth-token access-token
+                               :as          :json-kebab-keys})]
+    (if (http/success? response)
+      (:body response)
+      {:error {:response response}})))
 
 (comment
   (require '[dev]
@@ -62,4 +67,13 @@
                :password dev/password})
   (def c (client config))
 
-  (pprint (invoke c {:op :get-server-info})))
+  (pprint (invoke c {:op :get-server-info}))
+  (pprint (invoke c {:op :list-teams}))
+
+
+  (->> (invoke c {:op :list-jobs})
+       (:jobs)
+       (first))
+  (pprint)
+
+  )

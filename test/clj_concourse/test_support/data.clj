@@ -6,6 +6,10 @@
     [faker.internet :as faker-internet]
     [faker.lorem :as faker-lorem]))
 
+(defn random-pos-int
+  []
+  (gen/generate (gen/such-that pos? (gen/int))))
+
 (defn random-client
   [url]
   {:url url})
@@ -48,11 +52,16 @@
    :external-url   (random-absolute-url)
    :cluster-name   (random-cluster-name)})
 
-(defn random-team-id
-  []
-  (gen/generate (gen/such-that pos? (gen/int))))
+(def random-team-id random-pos-int)
 
 (defn random-team
   []
   {:id   (random-team-id)
+   :name (first (faker.lorem/words))})
+
+(def random-job-id random-pos-int)
+
+(defn random-job
+  []
+  {:id   (random-job-id)
    :name (first (faker.lorem/words))})

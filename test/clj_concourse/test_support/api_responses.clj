@@ -41,3 +41,12 @@
                           (map #(hash-map :id (:id %)
                                           :name (:name %))
                                teams))}]})}})
+(def get-jobs
+  {:success
+   {:->wmk-stub
+    (fn [jobs]
+      {:req [:GET "/api/v1/jobs"]
+       :res [200 {:body (json/->default-json
+                          (map #(hash-map :id (:id %)
+                                          :name (:name %))
+                               jobs))}]})}})
