@@ -1,6 +1,5 @@
 (ns clj-concourse.test-support.api-responses
   (:require
-    [clj-concourse.test-support.data :as data]
     [clj-concourse.test-support.json :as json]))
 
 (def get-token
@@ -41,6 +40,7 @@
                           (map #(hash-map :id (:id %)
                                           :name (:name %))
                                teams))}]})}})
+
 (def get-jobs
   {:success
    {:->wmk-stub

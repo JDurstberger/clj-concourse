@@ -71,7 +71,6 @@
       [((:->wmk-stub api-response) [team])]
       (is (= [expected-team] (concourse/invoke client {:op :list-teams}))))))
 
-
 (deftest returns-jobs
   (let [api-response (:success api-responses/get-jobs)
         client (data/random-client server-url)
