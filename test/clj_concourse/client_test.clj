@@ -60,7 +60,7 @@
       [((:->wmk-stub api-response) info)]
       (is (= expected-info (concourse/invoke client {:op :get-server-info}))))))
 
-(deftest returns-teams
+(deftest returns-all-teams
   (let [api-response (:success api-responses/get-teams)
         client (data/random-client server-url)
         team (data/random-team)
@@ -69,9 +69,9 @@
 
     (wmk/with-stubs
       [((:->wmk-stub api-response) [team])]
-      (is (= [expected-team] (concourse/invoke client {:op :list-teams}))))))
+      (is (= [expected-team] (concourse/invoke client {:op :list-all-teams}))))))
 
-(deftest returns-jobs
+(deftest returns-all-jobs
   (let [api-response (:success api-responses/get-jobs)
         client (data/random-client server-url)
         job (data/random-job)
@@ -80,9 +80,9 @@
 
     (wmk/with-stubs
       [((:->wmk-stub api-response) [job])]
-      (is (= [expected-job] (concourse/invoke client {:op :list-jobs}))))))
+      (is (= [expected-job] (concourse/invoke client {:op :list-all-jobs}))))))
 
-(deftest returns-pipelines
+(deftest returns-all-pipelines
   (let [api-response (:success api-responses/get-pipelines)
         client (data/random-client server-url)
         pipeline (data/random-pipeline)
@@ -92,7 +92,7 @@
     (wmk/with-stubs
       [((:->wmk-stub api-response) [pipeline])]
       (is (= [expected-pipeline]
-             (concourse/invoke client {:op :list-pipelines}))))))
+             (concourse/invoke client {:op :list-all-pipelines}))))))
 
 (deftest handles-server-error
   (let [api-response api-responses/generic-error
@@ -102,4 +102,4 @@
       [((:->wmk-stub api-response))]
       (is (= {:error {:status 500
                       :description (:body api-response)}}
-             (concourse/invoke client {:op :list-jobs}))))))
+             (concourse/invoke client {:op :list-all-jobs}))))))

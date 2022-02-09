@@ -29,14 +29,14 @@
     (catch Exception e (exception->error e))))
 
 (def operations
-  {:list-teams      {:http-method http/get
-                     :path        "/api/v1/teams"}
-   :list-pipelines  {:http-method http/get
-                     :path        "/api/v1/pipelines"}
-   :list-jobs       {:http-method http/get
-                     :path        "/api/v1/jobs"}
-   :get-server-info {:http-method http/get
-                     :path        "/api/v1/info"}})
+  {:list-all-teams     {:http-method http/get
+                        :path        "/api/v1/teams"}
+   :list-all-pipelines {:http-method http/get
+                        :path        "/api/v1/pipelines"}
+   :list-all-jobs      {:http-method http/get
+                        :path        "/api/v1/jobs"}
+   :get-server-info    {:http-method http/get
+                        :path        "/api/v1/info"}})
 
 (defn invoke
   [{:keys [url access-token]}
@@ -65,5 +65,5 @@
   (pprint (invoke c {:op :list-teams}))
 
 
-  (->> (invoke c {:op :list-pipelines})
+  (->> (invoke c {:op :list-all-pipelines})
        (first)))
