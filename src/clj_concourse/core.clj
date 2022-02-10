@@ -39,8 +39,8 @@
 (defn invoke
   [{:keys [url access-token]}
    {:keys [op] :as command}]
-  (let [{:keys [http-method path context-builder ops]} (op operations)
-        context (-> command :context meta)
+  (let [{:keys [http-method path context-builder ops param-key]} (op operations)
+        context (meta (get command param-key))
         response (http-method (str url (path/build-path context path))
                               {:oauth-token      access-token
                                :throw-exceptions false})]

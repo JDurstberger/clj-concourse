@@ -135,7 +135,7 @@
             team (first (:data teams-result))
             pipelines-result (concourse/invoke client
                                                {:op      :list-pipelines
-                                                :context team})
+                                                :team team})
             pipelines (:data pipelines-result)]
         (is (= [expected-pipeline] pipelines))))))
 
