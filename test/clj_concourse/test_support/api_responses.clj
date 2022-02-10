@@ -57,6 +57,14 @@
       {:req [:GET (str "/api/v1/teams/" team-name "/pipelines")]
        :res [200 {:body (pipelines->body pipelines)}]})}})
 
+(defn get-pipeline-jobs
+  [team-name pipeline-name]
+  {:success
+   {:->wmk-stub
+    (fn [jobs]
+      {:req [:GET (str "/api/v1/teams/" team-name "/pipelines/" pipeline-name "/jobs")]
+       :res [200 {:body (pipelines->body jobs)}]})}})
+
 (def get-jobs
   {:success
    {:->wmk-stub

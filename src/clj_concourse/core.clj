@@ -39,13 +39,14 @@
 (defn invoke
   [{:keys [url access-token]}
    {:keys [op] :as command}]
-  (let [{:keys [http-method path context-builder ops param-key]} (op operations)
+  (let [{:keys [http-method path attach-context ops param-key]} (op operations)
         context (meta (get command param-key))
-        response (http-method (str url (path/build-path context path))
+        url (str url (path/build-path context path))
+        response (http-method url
                               {:oauth-token      access-token
                                :throw-exceptions false})]
     (if (http/success? response)
-      {:data (context-builder (parse-response-body response))
+      {:data (attach-context context (parse-response-body response))
        :ops  ops}
       {:error {:status      (:status response)
                :description (:body response)}})))
@@ -59,11 +60,14 @@
                :password dev/password})
   (def c (client config))
 
-  (pprint (invoke c {:op :get-server-info}))
-  (def teams (:data (invoke c {:op :list-all-teams})))
-  (meta (first teams))
-  (invoke c {:op      :list-pipelines
-             :context (first teams)})
+  (as->
+    (invoke c {:op :list-all-teams})
+    $
+    (-> $ :data first)
+    (invoke c {:op   :list-pipelines
+               :team $})
+    (-> $ :data first)
+    (invoke c {:op       :list-jobs
+               :pipeline $})
+    (-> $ :data first)))
 
-  (->> (invoke c {:op :list-all-pipelines})
-       (first)))
