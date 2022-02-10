@@ -11,7 +11,7 @@
 (def server-url (str "http://localhost:" wiremock-port))
 
 (use-fixtures :once
-  (partial wmk/wiremock-fixture {:port wiremock-port}))
+              (partial wmk/wiremock-fixture {:port wiremock-port}))
 
 (def client-config
   {:url      server-url
@@ -58,18 +58,12 @@
                        :cluster-name   (:cluster-name info)}]
     (wmk/with-stubs
       [((:->wmk-stub api-response) info)]
-      (is (= expected-info (concourse/invoke client {:op :get-server-info}))))))
 
-(deftest returns-all-teams
-  (let [api-response (:success api-responses/get-teams)
-        client (data/random-client server-url)
-        team (data/random-team)
-        expected-team {:id   (:id team)
-                       :name (:name team)}]
+      (let [result (concourse/invoke client {:op :get-server-info})
+            server-info (:data result)]
+        (testing "server info is returned"
+          (is (= expected-info server-info)))))))
 
-    (wmk/with-stubs
-      [((:->wmk-stub api-response) [team])]
-      (is (= [expected-team] (concourse/invoke client {:op :list-all-teams}))))))
 
 (deftest returns-all-jobs
   (let [api-response (:success api-responses/get-jobs)
@@ -80,7 +74,11 @@
 
     (wmk/with-stubs
       [((:->wmk-stub api-response) [job])]
-      (is (= [expected-job] (concourse/invoke client {:op :list-all-jobs}))))))
+      (let [result (concourse/invoke client {:op :list-all-jobs})
+            jobs (:data result)]
+        (testing "jobs are returned"
+          (is (= [expected-job] jobs)))))))
+
 
 (deftest returns-all-pipelines
   (let [api-response (:success api-responses/get-pipelines)
@@ -91,8 +89,56 @@
 
     (wmk/with-stubs
       [((:->wmk-stub api-response) [pipeline])]
-      (is (= [expected-pipeline]
-             (concourse/invoke client {:op :list-all-pipelines}))))))
+      (let [result (concourse/invoke client {:op :list-all-pipelines})
+            pipelines (:data result)]
+        (testing "pipelines are returned"
+          (is (= [expected-pipeline] pipelines)))))))
+
+
+(deftest returns-all-teams
+  (let [api-response (:success api-responses/get-teams)
+        client (data/random-client server-url)
+        team (data/random-team)
+        expected-team {:id   (:id team)
+                       :name (:name team)}]
+
+    (wmk/with-stubs
+      [((:->wmk-stub api-response) [team])]
+      (let [result (concourse/invoke client {:op :list-all-teams})
+            teams (:data result)
+            team (first teams)]
+        (testing "teams are returned"
+          (is (= [expected-team] teams)))
+
+        (testing "operations are returned"
+          (is (= [:list-pipelines] (:ops result))))
+
+        (testing "context is attached to team"
+          (is (= {:context/team-name (:name team)}
+                 (meta team))))))))
+
+
+(deftest returns-pipelines-for-team
+  (let [team (data/random-team)
+        pipeline (data/random-pipeline)
+        teams-response (:success api-responses/get-teams)
+        pipelines-response (:success (api-responses/get-team-pipelines
+                                       (:name team)))
+        client (data/random-client server-url)
+        expected-pipeline {:id   (:id pipeline)
+                           :name (:name pipeline)}]
+
+    (wmk/with-stubs
+      [((:->wmk-stub teams-response) [team])
+       ((:->wmk-stub pipelines-response) [pipeline])]
+      (let [teams-result (concourse/invoke client {:op :list-all-teams})
+            team (first (:data teams-result))
+            pipelines-result (concourse/invoke client
+                                               {:op      :list-pipelines
+                                                :context team})
+            pipelines (:data pipelines-result)]
+        (is (= [expected-pipeline] pipelines))))))
+
 
 (deftest handles-server-error
   (let [api-response api-responses/generic-error
@@ -100,6 +146,6 @@
 
     (wmk/with-stubs
       [((:->wmk-stub api-response))]
-      (is (= {:error {:status 500
+      (is (= {:error {:status      500
                       :description (:body api-response)}}
              (concourse/invoke client {:op :list-all-jobs}))))))
