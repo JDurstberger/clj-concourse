@@ -21,19 +21,19 @@
 (deftest client-creation
   (testing "throws error when url not provided"
     (is (thrown? AssertionError
-                 (concourse/client (dissoc client-config :url)))))
+          (concourse/client (dissoc client-config :url)))))
 
   (testing "throws error when url not a url"
     (is (thrown? AssertionError
-                 (concourse/client (assoc client-config :url "not-a-url")))))
+          (concourse/client (assoc client-config :url "not-a-url")))))
 
   (testing "throws error when username not provided"
     (is (thrown? AssertionError
-                 (concourse/client (dissoc client-config :username)))))
+          (concourse/client (dissoc client-config :username)))))
 
   (testing "throws error when password not provided"
     (is (thrown? AssertionError
-                 (concourse/client (dissoc client-config :password)))))
+          (concourse/client (dissoc client-config :password)))))
 
   (testing "returns error when invalid credentials provided"
     (let [api-response (:invalid-credentials api-responses/get-token)

@@ -3,10 +3,11 @@
     [clj-concourse.auth :as auth]
     [clj-concourse.body-coercion]
     [clj-concourse.json :as json]
+    [clj-concourse.operations :refer [operations]]
+    [clj-concourse.path :as path]
     [clj-concourse.specs]
     [clj-http.client :as http]
-    [clojure.spec.alpha :as s]
-    [clojure.string :as str]))
+    [clojure.spec.alpha :as s]))
 
 (defn exception->error
   [e]
@@ -29,60 +30,18 @@
        :access-token access-token})
     (catch Exception e (exception->error e))))
 
-(def operations
-  {:list-all-teams     {:http-method http/get
-                        :path        "/api/v1/teams"
-                        :ops         [:list-pipelines]
-                        :context-builder
-                        #(map
-                           (fn [team]
-                             (with-meta
-                               team
-                               {:context/team-name (:name team)}))
-                           %)}
-
-   :list-all-pipelines {:http-method     http/get
-                        :path            "/api/v1/pipelines"
-                        :context-builder identity}
-   :list-all-jobs      {:http-method     http/get
-                        :path            "/api/v1/jobs"
-                        :context-builder identity}
-   :get-server-info    {:http-method     http/get
-                        :path            "/api/v1/info"
-                        :context-builder identity}
-   :list-pipelines     {:http-method     http/get
-                        :path            "/api/v1/teams/{team-name}/pipelines"
-                        :context-builder identity}})
-
 (defn parse-response-body
   [response]
   (-> response
       :body
       (json/<-concourse-json)))
 
-(defn path->template-names
-  [path]
-  (->> (re-matcher #"(\{(.*?)\})" path)
-       ((fn [matcher] (repeatedly #(re-find matcher))))
-       (map last)
-       (take-while some?)))
-
-(defn build-path
-  [context path]
-  (let [template-names (path->template-names path)]
-    (reduce (fn [path template-name]
-              (str/replace path
-                           (str "{" template-name "}")
-                           (get context (keyword "context" template-name))))
-            path
-            template-names)))
-
 (defn invoke
   [{:keys [url access-token]}
    {:keys [op] :as command}]
   (let [{:keys [http-method path context-builder ops]} (op operations)
         context (-> command :context meta)
-        response (http-method (str url (build-path context path))
+        response (http-method (str url (path/build-path context path))
                               {:oauth-token      access-token
                                :throw-exceptions false})]
     (if (http/success? response)
@@ -103,7 +62,7 @@
   (pprint (invoke c {:op :get-server-info}))
   (def teams (:data (invoke c {:op :list-all-teams})))
   (meta (first teams))
-  (invoke c {:op :list-pipelines
+  (invoke c {:op      :list-pipelines
              :context (first teams)})
 
   (->> (invoke c {:op :list-all-pipelines})
