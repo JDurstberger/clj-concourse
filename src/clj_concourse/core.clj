@@ -53,6 +53,7 @@
    :list-pipelines     {:http-method     http/get
                         :path            "/api/v1/teams/{team-name}/pipelines"
                         :context-builder identity}})
+
 (defn parse-response-body
   [response]
   (-> response

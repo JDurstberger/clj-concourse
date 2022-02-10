@@ -11,7 +11,7 @@
 (def server-url (str "http://localhost:" wiremock-port))
 
 (use-fixtures :once
-              (partial wmk/wiremock-fixture {:port wiremock-port}))
+  (partial wmk/wiremock-fixture {:port wiremock-port}))
 
 (def client-config
   {:url      server-url
@@ -20,16 +20,20 @@
 
 (deftest client-creation
   (testing "throws error when url not provided"
-    (is (thrown? AssertionError (concourse/client (dissoc client-config :url)))))
+    (is (thrown? AssertionError
+                 (concourse/client (dissoc client-config :url)))))
 
   (testing "throws error when url not a url"
-    (is (thrown? AssertionError (concourse/client (assoc client-config :url "not-a-url")))))
+    (is (thrown? AssertionError
+                 (concourse/client (assoc client-config :url "not-a-url")))))
 
   (testing "throws error when username not provided"
-    (is (thrown? AssertionError (concourse/client (dissoc client-config :username)))))
+    (is (thrown? AssertionError
+                 (concourse/client (dissoc client-config :username)))))
 
   (testing "throws error when password not provided"
-    (is (thrown? AssertionError (concourse/client (dissoc client-config :password)))))
+    (is (thrown? AssertionError
+                 (concourse/client (dissoc client-config :password)))))
 
   (testing "returns error when invalid credentials provided"
     (let [api-response (:invalid-credentials api-responses/get-token)
@@ -64,7 +68,6 @@
         (testing "server info is returned"
           (is (= expected-info server-info)))))))
 
-
 (deftest returns-all-jobs
   (let [api-response (:success api-responses/get-jobs)
         client (data/random-client server-url)
@@ -79,7 +82,6 @@
         (testing "jobs are returned"
           (is (= [expected-job] jobs)))))))
 
-
 (deftest returns-all-pipelines
   (let [api-response (:success api-responses/get-pipelines)
         client (data/random-client server-url)
@@ -93,7 +95,6 @@
             pipelines (:data result)]
         (testing "pipelines are returned"
           (is (= [expected-pipeline] pipelines)))))))
-
 
 (deftest returns-all-teams
   (let [api-response (:success api-responses/get-teams)
@@ -117,7 +118,6 @@
           (is (= {:context/team-name (:name team)}
                  (meta team))))))))
 
-
 (deftest returns-pipelines-for-team
   (let [team (data/random-team)
         pipeline (data/random-pipeline)
@@ -138,7 +138,6 @@
                                                 :context team})
             pipelines (:data pipelines-result)]
         (is (= [expected-pipeline] pipelines))))))
-
 
 (deftest handles-server-error
   (let [api-response api-responses/generic-error

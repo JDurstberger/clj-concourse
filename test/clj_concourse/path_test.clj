@@ -20,4 +20,3 @@
         expected-path "/v1/api/teams/team1/pipelines/pipeline1"]
     (is (= expected-path (concourse/build-path context path)))))
 
-
